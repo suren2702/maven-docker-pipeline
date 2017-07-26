@@ -23,11 +23,12 @@
   </properties>
 
   <profiles>
-    <!-- Default build profile -->
     <profile>
       <id>default</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!skipDefault</name>
+        </property>
       </activation>
       <properties>
         <skip.docker.build>true</skip.docker.build>
@@ -36,11 +37,27 @@
       </properties>
     </profile>
     <profile>
-      <id>docker</id>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
       <properties>
-        <skip.docker.build>false</skip.docker.build>
-        <skip.unit.tests>false</skip.unit.tests>
-        <skip.acceptance.tests>true</skip.acceptance.tests>
+        <at.pre.script>pre.bat</at.pre.script>
+        <at.post.script>post.bat</at.post.script>
+      </properties>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <at.pre.script>./pre.sh</at.pre.script>
+        <at.post.script>./post.sh</at.post.script>
       </properties>
     </profile>
     <!-- Configuration for acceptance tests -->
@@ -53,29 +70,13 @@
         <at.workingDirectory>${project.basedir}/docker</at.workingDirectory>
       </properties>
     </profile>
+    <!-- Configuration for docker build -->
     <profile>
-      <id>at-windows</id>
-      <activation>
-        <os>
-          <family>Windows</family>
-        </os>
-      </activation>
+      <id>docker</id>
       <properties>
-        <skip.docker.build>true</skip.docker.build>
-        <at.pre.script>pre.bat</at.pre.script>
-        <at.post.script>post.bat</at.post.script>
-      </properties>
-    </profile>
-    <profile>
-      <id>at-linux</id>
-      <activation>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <properties>
-        <at.pre.script>./pre.sh</at.pre.script>
-        <at.post.script>./post.sh</at.post.script>
+        <skip.docker.build>false</skip.docker.build>
+        <skip.unit.tests>false</skip.unit.tests>
+        <skip.acceptance.tests>true</skip.acceptance.tests>
       </properties>
     </profile>
   </profiles>
@@ -129,7 +130,6 @@
           <includes>
             <include>**/*AcceptanceTest.java</include>
           </includes>
-          <argLine>-Dbdd.rest.port=${bdd.rest.port}</argLine>
         </configuration>
         <executions>
           <execution>
