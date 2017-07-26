@@ -31,12 +31,51 @@
       </activation>
       <properties>
         <skip.docker.build>true</skip.docker.build>
+        <skip.unit.tests>false</skip.unit.tests>
+        <skip.acceptance.tests>true</skip.acceptance.tests>
       </properties>
     </profile>
     <profile>
       <id>docker</id>
       <properties>
         <skip.docker.build>false</skip.docker.build>
+        <skip.unit.tests>false</skip.unit.tests>
+        <skip.acceptance.tests>true</skip.acceptance.tests>
+      </properties>
+    </profile>
+    <!-- Configuration for acceptance tests -->
+    <profile>
+      <id>at</id>
+      <properties>
+        <skip.docker.build>true</skip.docker.build>
+        <skip.unit.tests>true</skip.unit.tests>
+        <skip.acceptance.tests>false</skip.acceptance.tests>
+        <at.workingDirectory>${project.basedir}/docker</at.workingDirectory>
+      </properties>
+    </profile>
+    <profile>
+      <id>at-windows</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <skip.docker.build>true</skip.docker.build>
+        <at.pre.script>pre.bat</at.pre.script>
+        <at.post.script>post.bat</at.post.script>
+      </properties>
+    </profile>
+    <profile>
+      <id>at-linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <at.pre.script>./pre.sh</at.pre.script>
+        <at.post.script>./post.sh</at.post.script>
       </properties>
     </profile>
   </profiles>
@@ -44,6 +83,21 @@
   <build>
     <finalName>maven-docker-pipeline</finalName>
     <plugins>
+      <!-- Unit tests execution -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>${skip.unit.tests}</skipTests>
+          <runOrder>hourly</runOrder>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/*AcceptanceTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -66,6 +120,57 @@
           <tag>latest</tag>
         </configuration>
       </plugin>
+      <!-- Acceptance tests execution -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <skipTests>${skip.acceptance.tests}</skipTests>
+          <includes>
+            <include>**/*AcceptanceTest.java</include>
+          </includes>
+          <argLine>-Dbdd.rest.port=${bdd.rest.port}</argLine>
+        </configuration>
+        <executions>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>start-containers</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <skip>${skip.acceptance.tests}</skip>
+              <workingDirectory>${at.workingDirectory}</workingDirectory>
+              <executable>${at.pre.script}</executable>
+            </configuration>
+          </execution>
+          <execution>
+            <id>stop-containers</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <phase>post-integration-test</phase>
+            <configuration>
+              <skip>${skip.acceptance.tests}</skip>
+              <workingDirectory>${at.workingDirectory}</workingDirectory>
+              <executable>${at.post.script}</executable>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -73,6 +178,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

@@ -1,0 +1,7 @@
+version: '2'
+services:
+  maven-docker-pipeline:
+    container_name: maven-docker-pipeline
+    image: maven-docker-pipeline:latest
+    ports:
+    - 8080:8080
