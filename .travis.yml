@@ -3,4 +3,4 @@ sudo: false
 dist: trusty
 
 script:
-- make build
+- make docker-build
