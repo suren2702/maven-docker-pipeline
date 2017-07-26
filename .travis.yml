@@ -5,5 +5,11 @@ dist: trusty
 services:
 - docker
 
+before_script:
+- docker --version
+
 script:
 - make docker-build
+
+after_script:
+- docker images
