@@ -6,11 +6,6 @@ else
 	docker_build_cmd = $(maven) clean package -Pdocker
 endif
 
-
-ifeq ($(OS),Windows_NT)
-else
-endif
-
 build: ## Build the application with mvn clean package
 	$(maven) clean package
 
