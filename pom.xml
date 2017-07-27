@@ -7,7 +7,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>maven-docker-pipeline</name>
-  <description>A sample project that demonstrates the usage of maven docker plugin within a continuous delivery pipeline</description>
+  <description>A sample project that demonstrates the usage of dockerfile maven plugin within a continuous delivery pipeline run with travis ci</description>
   <url>https://github.com/adhuc-projects/maven-docker-pipeline</url>
 
   <parent>
@@ -103,6 +103,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <!-- Docker image build execution -->
       <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>dockerfile-maven-plugin</artifactId>
@@ -131,15 +132,6 @@
             <include>**/*AcceptanceTest.java</include>
           </includes>
         </configuration>
-        <executions>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
