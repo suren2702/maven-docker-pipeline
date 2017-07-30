@@ -65,3 +65,13 @@ The docker environment can be stopped using `make down` or `cd docker && docker-
 ## Acceptance tests
 
 From `maven-docker-pipeline` project folder, execute either `make test` or `mvn verify -Pat` command. The latter command will be used in all cases to run the build. The default profile will skip the acceptance tests execution.
+
+## Pipeline
+
+The travis pipeline is split into 3 parts :
+
+- `commit stage` builds the java application as an executable jar, then embeds it in a docker image and pushes the image to docker hub as a `pending` image
+- `acceptance testing` validates the `pending` image's functional and cross functional requirements
+- `promote image` promotes the `pending` image as the `latest` accepted one
+
+The image still needs to be tagged with the corresponding application's version and pipeline's build number.
