@@ -25,7 +25,8 @@ jobs:
     - stage: promote image
       script:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - docker tag maven-docker-pipeline:latest $DOCKER_USERNAME/maven-docker-pipeline:latest
+      - docker pull $DOCKER_USERNAME/maven-docker-pipeline:pending
+      - docker tag $DOCKER_USERNAME/maven-docker-pipeline:pending $DOCKER_USERNAME/maven-docker-pipeline:latest
       - docker push $DOCKER_USERNAME/maven-docker-pipeline:latest
 
 notifications:
