@@ -18,3 +18,8 @@ script:
 
 after_script:
 - docker images
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
