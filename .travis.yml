@@ -9,15 +9,24 @@ cache:
 services:
 - docker
 
-before_script:
-- docker --version
-
-script:
-- make docker-build
-- make test
-
-after_script:
-- docker images
+jobs:
+  include:
+    - stage: commit stage
+      script:
+      - make docker-build
+      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - docker tag maven-docker-pipeline:latest $DOCKER_USERNAME/maven-docker-pipeline:pending
+      - docker push $DOCKER_USERNAME/maven-docker-pipeline:pending
+    - stage: acceptance testing
+      script:
+      - docker pull $DOCKER_USERNAME/maven-docker-pipeline:pending
+      - docker tag $DOCKER_USERNAME/maven-docker-pipeline:pending maven-docker-pipeline:latest
+      - make test
+    - stage: promote image
+      script:
+      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - docker tag maven-docker-pipeline:latest $DOCKER_USERNAME/maven-docker-pipeline:latest
+      - docker push $DOCKER_USERNAME/maven-docker-pipeline:latest
 
 notifications:
   email:
