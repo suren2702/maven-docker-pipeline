@@ -20,7 +20,7 @@ jobs:
       - git tag -a $TRAVIS_BUILD_NUMBER -m "Travis CI build $TRAVIS_BUILD_NUMBER"
       - git config --global user.name "Travis CI"
       - git config --global user.email "travis-ci@adhuc.org"
-      - git push https://$GITHUB_AUTH@github.com/adhuc-projects/maven-docker-pipeline --tags
+      - git push https://$GITHUB_AUTH:x-oauth-basic@github.com/adhuc-projects/maven-docker-pipeline --tags
     - stage: acceptance testing
       script:
       - docker pull $DOCKER_USERNAME/maven-docker-pipeline:pending
