@@ -17,7 +17,7 @@ jobs:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - docker tag maven-docker-pipeline:latest $DOCKER_USERNAME/maven-docker-pipeline:pending
       - docker push $DOCKER_USERNAME/maven-docker-pipeline:pending
-      - git tag -a $TRAVIS_BUILD_NUMBER -m "Travis CI build #$TRAVIS_BUILD_NUMBER"
+      - git tag -a $TRAVIS_BUILD_NUMBER -m "Travis CI build $TRAVIS_BUILD_NUMBER"
       - git push origin --tags
     - stage: acceptance testing
       script:
